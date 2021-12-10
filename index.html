@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Scrooge McDuck's Bitcoin app</title>
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+
+
+    <body>
+        <div id="titleDiv">
+            <h1 class="titleChild" id="titleText">Scrooge McDuck's Bitcoin app</h1>
+            <picture class="titleChild">
+                <img src="images/mcduck.jpg" id="scrooge" alt="Scrooge McDuck">
+            </picture>
+        </div>
+
+        <div id="dateOptionsDiv">
+            <label for="startDate" class="dateOptionsChild">Start date</label><input type="date" id="startDate"  class="dateOptionsChild">
+            <label for="endDate" class="dateOptionsChild">End date</label><input type="date" id="endDate" class="dateOptionsChild">
+        </div>
+
+        <div id="resultParameters">
+            <input type="checkbox" id="downwardTrend" class="resultParaElements"><label for="downwardTrend">Longest downward trend</label><br>
+            <input type="checkbox" id="highestTradingVolume" class="resultParaElements"><label for="highestTradingVolume">Highest trading volume</label><br>
+            <input type="checkbox" id="timeMachine" class="resultParaElements"><label for="timeMachine">Time machine exploit</label><br>
+            <input type="submit" id="submitBtn" name="submit" value="Get results">
+        </div>
+
+
+        <div id="resultsDiv">
+
+
+        </div>
+
+
+    </body>
+
+    <script src="app.js">
+
+    </script>
+</html>

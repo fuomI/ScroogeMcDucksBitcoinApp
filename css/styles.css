@@ -1,0 +1,81 @@
+html {
+    font-size: 14px;
+}
+
+h1 {
+    font-size: 2.4vw;
+}
+
+body {
+    background-image: url("../images/background.jpg");
+    background-size: auto;
+    font-family: verdana;
+}
+
+div {
+    align-content: center;
+    text-align: center;
+    width: 70%;
+    margin-right: auto;
+    margin-left: auto;
+    background: rgba(41, 2, 34, 0.438);
+    color: white;
+}
+
+#titleDiv {
+    white-space: nowrap;
+}
+
+.titleChild {
+    display: inline-block;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+#scrooge {
+    opacity: 0.5;
+    border-radius: 50%;
+    width: 3vw;
+    margin-top: 2vw;
+}
+
+#dateOptionsDiv {
+    padding-top: 5vw;
+    white-space: nowrap;
+}
+
+.dateOptionsChild {
+    display: inline-block;
+    font-size: 1.5vw;
+}
+
+#resultParameters {
+    padding-top: 2vw;
+    text-align: left;
+    padding-bottom: 4vw;
+}
+
+.resultParaElements {
+    margin-left: 30%;
+}
+
+#submitBtn {
+    margin-top: 2vw;
+    margin-left: 30%;
+    font-family: verdana;
+    color: #000000 !important;
+    padding: 4px 5px;
+    border-radius: 4px;
+    border: 2px solid #000000;
+    background: #F4FAEB;
+}
+
+#submitBtn:hover {
+    color: #000000 !important;
+    background: #BBD9B2;
+}
+
+label {
+    margin-right: 1vw;
+    margin-left: 1vw;
+}
