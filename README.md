@@ -1,0 +1,2 @@
+# scrooge-mcducks-bitcoin-app
+
