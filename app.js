@@ -9,25 +9,23 @@ let endDate = document.getElementById("endDate");
 endDate.value = '2020-02-15';
 let endDateValue = endDate.value;
 
-// We need a function that changes strings to dates, and dates to UNIXTIMESTAMPS.
-// We need to split the format used in "input date", so that
-// we can make a date object, which we can then format into UNIXTIMESTAMP.
-// We use time 23:00:00 (close to midnight), when creating the date object.
+// Strings to dates, dates to UNIXTIMESTAMPS.
+// We choose 23rd hour because we want datapoints closest to midnight.
 function getUnixDate(dateString) {
 
     let dateArray = dateString.split("-");
 
-    // We want to make sure that we use UTC time.
+    // We want to make sure that we use UTC time, because Coingecko API does.
     let properDate = new Date(Date.UTC(dateArray[0], (dateArray[1] - 1),
     dateArray[2], '23', '00', '00'));
 
+    // Date to UNIXTIMESTAMP
     let unixFormDate = Math.round(properDate.getTime()/1000);
 
     return unixFormDate;
 }
 
-// Simple function that returns the URL (Coingecko)
-// needed for fetching the desirable data.
+// Simple function that returns the API URL (Coingecko)
 function getURL(startDateUnix, endDateUnix) {
 
     let apiURL = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from=" +
@@ -37,25 +35,21 @@ function getURL(startDateUnix, endDateUnix) {
 }
 
 
-// We need to change normal dates to
-// UNIXTIMESTAMPS, because the API
-// uses UNIXTIMESTAMPS.
+// Start date to UNIXTIMESTAMP Start date.
 let startDateUnix = getUnixDate(startDateValue);
 
-// For endDate we add 3600 seconds to ensure
-// that we get enough datapoints for the enddate.
+// End date gets extra 3600 seconds, to get datapoints closest to midnight.
 let endDateUnix = getUnixDate(endDateValue) + 3600;
 
-// Correct url is made with help function getURL(startDateUnix, endDateUnix)
+// API URL with desired interval.
 let apiURL = getURL(startDateUnix, endDateUnix);
 
-// We are doing XMLHttpRequest (GET) to the API.
+// XMLHttpRequest (GET) to the API.
 let xmlhttp = new XMLHttpRequest();
 xmlhttp.open("GET", apiURL, true);
 xmlhttp.send();
 
-// We make responseObject to hold JSON data
-// so that we can easily access the data elsewhere.
+// responseObject to hold JSON data.
 let responseObject = {};
 
 // If the request is completed and status is OK
@@ -63,6 +57,8 @@ let responseObject = {};
 xmlhttp.onreadystatechange=function() {
 
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+        console.log("XMLHttpRequest successful");
 
         // We use JSON.parse to change String to an object.
         responseObject = JSON.parse(xmlhttp.responseText);
