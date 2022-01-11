@@ -1,4 +1,4 @@
-// responseObject to hold JSON data.
+// responseObject to hold JSON data from API.
 let responseObject = {};
 
 // Get data using datepicker's inputs.
