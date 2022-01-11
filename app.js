@@ -1,67 +1,62 @@
-
-// Let's give startDate and endDate some values right at start
-// to make our testing process faster.
-let startDate = document.getElementById("startDate");
-startDate.value = '2020-01-01';
-let startDateValue = startDate.value;
-
-let endDate = document.getElementById("endDate");
-endDate.value = '2020-02-15';
-let endDateValue = endDate.value;
-
-// Strings to dates, dates to UNIXTIMESTAMPS.
-// We choose 23rd hour because we want datapoints closest to midnight.
-function getUnixDate(dateString) {
-
-    let dateArray = dateString.split("-");
-
-    // We want to make sure that we use UTC time, because Coingecko API does.
-    let properDate = new Date(Date.UTC(dateArray[0], (dateArray[1] - 1),
-    dateArray[2], '23', '00', '00'));
-
-    // Date to UNIXTIMESTAMP
-    let unixFormDate = Math.round(properDate.getTime()/1000);
-
-    return unixFormDate;
-}
-
-// Simple function that returns the API URL (Coingecko)
-function getURL(startDateUnix, endDateUnix) {
-
-    let apiURL = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from=" +
-    startDateUnix + "&to=" + endDateUnix;
-
-    return apiURL;
-}
-
-
-// Start date to UNIXTIMESTAMP Start date.
-let startDateUnix = getUnixDate(startDateValue);
-
-// End date gets extra 3600 seconds, to get datapoints closest to midnight.
-let endDateUnix = getUnixDate(endDateValue) + 3600;
-
-// API URL with desired interval.
-let apiURL = getURL(startDateUnix, endDateUnix);
-
-// XMLHttpRequest (GET) to the API.
-let xmlhttp = new XMLHttpRequest();
-xmlhttp.open("GET", apiURL, true);
-xmlhttp.send();
-
 // responseObject to hold JSON data.
 let responseObject = {};
 
-// If the request is completed and status is OK
-// we can start manipulating data.
-xmlhttp.onreadystatechange=function() {
+// Get data using datepicker's inputs.
+function getData() {
 
-    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+    // Initializing startDate and endDate.
+    let startDate = document.getElementById("startDate");
 
-        console.log("XMLHttpRequest successful");
+    let endDate = document.getElementById("endDate");
 
-        // We use JSON.parse to change String to an object.
-        responseObject = JSON.parse(xmlhttp.responseText);
+    // Strings to dates, dates to UNIXTIMESTAMPS.
+    // We choose 23rd hour because we want datapoints closest to midnight.
+    function getUnixDate(dateString) {
+
+        let dateArray = dateString.split("-");
+
+        // We want to make sure that we use UTC time, because Coingecko API does.
+        let properDate = new Date(Date.UTC(dateArray[0], (dateArray[1] - 1),
+        dateArray[2], '23', '00', '00'));
+
+        // Date to UNIXTIMESTAMP
+        let unixDate = Math.round(properDate.getTime()/1000);
+
+        return unixDate;
+    }
+
+    // Start date to UNIXTIMESTAMP Start date.
+    let startDateUnix = getUnixDate(startDate.value);
+
+    // End date gets extra 3600 seconds, to get datapoints closest to midnight.
+    let endDateUnix = getUnixDate(endDate.value) + 3600;
+
+    // Simple function that returns the API URL (Coingecko)
+    function getURL(startDateUnix, endDateUnix) {
+
+        let apiURL = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from=" +
+        startDateUnix + "&to=" + endDateUnix;
+
+        return apiURL;
+    }
+
+    // API URL with desired interval.
+    let apiURL = getURL(startDateUnix, endDateUnix);
+
+    // XMLHttpRequest (GET) to the API.
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", apiURL, true);
+    xmlhttp.send();
+
+    // If the request is completed and status is OK.
+    xmlhttp.onreadystatechange=function() {
+
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+            // We use JSON.parse to change String to an object.
+            responseObject = JSON.parse(xmlhttp.responseText);
+            console.log(responseObject);
+        }
     }
 }
 
@@ -70,42 +65,57 @@ xmlhttp.onreadystatechange=function() {
 //                    responseObject.market_caps Array (2) [UNIXTIMESTAMP, MARKET_CAPS]
 //                    responseObject.total_volumes Array (2) [UNIXTIMESTAMP, TOTAL_VOLUMES]
 
-// We need a function to find out the correct data point
-// for each day in the range. The function returns
-// an array of indexes with appropriate data points.
-function getCorrectDataPoint(responseObject) {
+// Correct datapoint(closest to midnight) for each day.
+function getCorrectDatapoint(responseObject) {
 
-    let dataPointArray = [];
-    let correctDataPoint = 0;
+    let datapointArray = [];
+    let correctDatapoint = 0;
 
     for (let i = 0; i < responseObject.prices.length; i++) {
 
-        let properDate = new Date(responseObject.prices[i][0]);
+        let thisDate = new Date(responseObject.prices[i][0]);
 
         if (responseObject.prices[i+1] != undefined) {
 
-            let properNextDate = new Date(responseObject.prices[i+1][0]);
+            let nextDate = new Date(responseObject.prices[i+1][0]);
 
             // The last data point is the closest to midnight and
             // thus it is the correct data point. If the next date
             // is still the same day, we get to the last data point
             // of the day eventually. We want UTC time.
-            if (properDate.getUTCDay() == properNextDate.getUTCDay() &&
-            properDate.getUTCMonth() == properNextDate.getUTCMonth() &&
-            properDate.getUTCFullYear() == properNextDate.getUTCFullYear()) {
+            if (thisDate.getUTCDay() === nextDate.getUTCDay() &&
+            thisDate.getUTCMonth() === nextDate.getUTCMonth() &&
+            thisDate.getUTCFullYear() === nextDate.getUTCFullYear()) {
 
-                correctDataPoint = i+1;
+                correctDatapoint = i+1;
             } else {
 
-                dataPointArray.push(correctDataPoint);
+                datapointArray.push(correctDatapoint);
             }
         } else {
-            correctDataPoint = i;
-            dataPointArray.push(correctDataPoint);
+            correctDatapoint = i;
+            datapointArray.push(correctDatapoint);
         }
     }
 
-    return dataPointArray;
+    return datapointArray;
+}
+
+// Testing the dataPointArray[]
+
+function datapointTest() {
+
+    let datapointArray = getCorrectDatapoint(responseObject);
+    // console.log(datapointArray);
+
+    datapointArray.forEach(showPriceData);
+
+    function showPriceData(i) {
+
+        let thisDate = new Date(responseObject.prices[i][0]);
+        let thisPrice = responseObject.prices[i][1];
+        console.log("Date: " + thisDate + " Price: " + thisPrice);
+    }
 }
 
 // We need a function to find out,
@@ -121,7 +131,7 @@ function longestDownwardTrend(responseObject) {
 
     // We only want to go through indexes which are
     // known to be appropriate datapoints.
-    let dataPoints = getCorrectDataPoint(obj);
+    let dataPoints = getCorrectDatapoint(obj);
 
     // Variable for tracking the consecutive days with
     // downward trend.
