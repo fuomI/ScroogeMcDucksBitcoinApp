@@ -29,3 +29,23 @@ function datapointTest() {
         console.log("Price: " + value);
     }
 }
+
+// Checking the date and price of datapoints in longest downward trend.
+function datapointTestDW() {
+
+    let dpArr = dwTrend();
+    let origObj = responseObject.prices;
+
+    for (let i = 0; i < dpArr.length; i++) {
+
+        let j = dpArr[i];
+        let date = new Date(origObj[j][0]);
+        let value = origObj[j][1];
+
+        // Datapoint date
+        console.log("Date: " + date);
+
+        // Datapoint price
+        console.log("Price: " + value);
+    }
+}

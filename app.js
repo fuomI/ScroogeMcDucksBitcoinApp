@@ -4,7 +4,7 @@ let startDate = document.getElementById("startDate");
 startDate.value = '2020-01-01';
 
 let endDate = document.getElementById("endDate");
-endDate.value = '2021-01-30';
+endDate.value = '2020-01-30';
 
 // responseObject to hold JSON data from API.
 let responseObject = {};
@@ -74,42 +74,42 @@ function getData() {
 //                          responseObject.total_volumes Array (2) [UNIXTIMESTAMP, TOTAL_VOLUMES]
 
 // Correct datapoint(closest to midnight) for each day.
-function getCorrectDatapoints() {
+function getValidDatapoints() {
 
-    let arr = responseObject.prices;
-    let dpArr = [];
+    let obj = responseObject.prices;
+    let dateArr = [];
+    let priceArr = [];
 
-    // first unixtimestamp: console.log(arr[0][0]);
-    // first price: console.log(arr[0][1]);
+    for (let i = 0; i < obj.length; i++) {
 
-    for (let i = 0; i < arr.length; i++) {
-
-        let date = new Date(arr[i][0]);
+        let price = obj[i][1];
+        let date = new Date(obj[i][0]);
 
         // Last datapoint is the correct datapoint for last day.
-        if (i === (arr.length -1)) {
+        if (i === (obj.length -1)) {
+            dateArr.push(date);
+            priceArr.push(price);
+        } else if ((i+1) <= (obj.length -1)) {
 
-            dpArr.push(i);
-            console.log("Added last datapoint: " + date);
-        } else if ((i+1) <= (arr.length -1)) {
-
-            let dateNext = new Date(arr[i+1][0]);
+            let dateNext = new Date(obj[i+1][0]);
 
             // If current date is different than nextDate,
             // current date is correct datapoint (closest to midnight)
             if (date.getUTCDay() !== dateNext.getUTCDay()) {
-
-                dpArr.push(i);
-                console.log("Added datapoint: " + date);
+                dateArr.push(date);
+                priceArr.push(price);
             }
         }
     }
-    // Returns the datapoint array with correct datapoints.
-    return dpArr;
+    let dpObj = {dateArr, priceArr};
+
+    // Returns the object with correct datapoints.
+    return dpObj;
 }
 
-// Checking all datapoints.
+// Checking dates of all datapoints.
 function testAllDatapoints() {
+
     let allDP = responseObject.prices;
 
     for (let i = 0; i < allDP.length; i++) {
@@ -119,18 +119,15 @@ function testAllDatapoints() {
     }
 }
 
-// Testing the dpArr.
+// Checking the date and price of valid datapoints.
 function datapointTest() {
 
-    let dpArr = getCorrectDatapoints();
-    let origArr = responseObject.prices;
-    // console.log(datapointArray);
+    let dpObj = getValidDatapoints();
 
-    for (let i = 0; i < dpArr.length; i++) {
-        let j = dpArr[i];
+    for (let i = 0; i < dpObj.length; i++) {
 
-        let date = new Date(origArr[j][0]);
-        let value = origArr[j][1];
+        let date = dpObj.dateArr[i];
+        let value = dpObj.priceArr[i];
 
         // Datapoint date
         console.log("Date: " + date);
@@ -140,59 +137,58 @@ function datapointTest() {
     }
 }
 
+// Longest downward trend is most consecutive days of price going down.
+function dwTrend() {
 
-// We need a function to find out,
-// what is the longest downward trend in bitcoin's
-// history. We use getCorrectDataPoints() function to
-// get appropriate data point for each day.
-function longestDownwardTrend(responseObject) {
+    let dpArr = getValidDatapoints();
+    let obj = responseObject.prices;
 
-    let obj = responseObject;
+    let dwArr = [];
+    let arr = [];
 
-    // The String we want to return at the end
-    let longestDWTrend = "";
+    for (let i = 1; i < dpArr.length; i++) {
 
-    // We only want to go through indexes which are
-    // known to be appropriate datapoints.
-    let dataPoints = getCorrectDatapoint(obj);
+        let j = dpArr[i];
 
-    // Variable for tracking the consecutive days with
-    // downward trend.
-    let dwDays = 0;
-    let dwDaysLongest = 0;
+        let price = obj[j][1];
+        let priceYd = obj[j-1][1];
 
-    // Arrays for tracking the indexes.
-    let dwIndexes = [];
-    let dwIndexesLongest = [];
-
-    let j;
-
-    for (let i = 0; i < dataPoints.length; i++) {
-
-        // Variables for clarity.
-        let currentIndex = dataPoints[i];
-        let nextIndex = dataPoints[i+1];
-
-
-        if (nextIndex != undefined && obj.prices[currentIndex][1] >
-            obj.prices[nextIndex][1]) {
-
-            dwDays += 1;
-            dwIndexes.push(nextIndex);
+        if (price > priceYd && arr.length > dwArr.length) {
+            console.log (price + " is bigger than " + priceYd);
+            dwArr = arr;
+            arr = [];
+        } else if (price > priceYd) {
+            console.log (price + " is bigger than " + priceYd);
+            arr = [];
+        } else {
+            console.log (price + " is smaller than " + priceYd);
+            arr.push(j);
+            console.log(arr);
         }
-
-        else if (nextIndex != undefined && obj.prices[currentIndex][1] <
-            obj.prices[nextIndex][1] && dwDays > dwDaysLongest) {
-
-            dwDaysLongest = dwDays;
-            dwIndexesLongest = dwIndexes;
-            dwDays = 0;
-            dwIndexes = [];
-        }
-
     }
+    return dwArr;
+}
 
-    // Presenting the data:
+// Checking the date and price of datapoints in longest downward trend.
+function datapointTestDW() {
+
+    let dpArr = dwTrend();
+    let origObj = responseObject.prices;
+
+    for (let i = 0; i < dpArr.length; i++) {
+
+        let j = dpArr[i];
+        let date = new Date(origObj[j][0]);
+        let value = origObj[j][1];
+
+        // Datapoint date
+        console.log("Date: " + date);
+
+        // Datapoint price
+        console.log("Price: " + value);
+    }
+}
+    /* Presenting the data:
     let dwIndexLength = dwIndexesLongest.length;
     let dwStartDate = new Date(obj.prices[dwIndexesLongest[0]][0]);
     let dwEndDate = new Date(obj.prices[dwIndexesLongest[dwIndexLength-1]][0]);
@@ -209,8 +205,8 @@ function longestDownwardTrend(responseObject) {
     longestDWTrend += "was <b>" + dwDaysLongest + "</b> days ";
     longestDWTrend += "during the time between " + dwStart + " and " + dwEnd + "</p>";
 
-    return longestDWTrend;
-}
+    return longestDWTrend; */
+
 
 // Setting event listener
 document.getElementById("submitBtn").addEventListener("click", function () {
