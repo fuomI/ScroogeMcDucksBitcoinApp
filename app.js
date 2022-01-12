@@ -1,3 +1,11 @@
+// Let's give startDate and endDate some values right at start
+// to make our testing process faster.
+let startDate = document.getElementById("startDate");
+startDate.value = '2020-01-01';
+
+let endDate = document.getElementById("endDate");
+endDate.value = '2021-01-30';
+
 // responseObject to hold JSON data from API.
 let responseObject = {};
 
@@ -16,11 +24,11 @@ function getData() {
         let dateArray = dateString.split("-");
 
         // We want to make sure that we use UTC time, because Coingecko API does.
-        let properDate = new Date(Date.UTC(dateArray[0], (dateArray[1] - 1),
+        let date = new Date(Date.UTC(dateArray[0], (dateArray[1] - 1),
         dateArray[2], '23', '00', '00'));
 
         // Date to UNIXTIMESTAMP
-        let unixDate = Math.round(properDate.getTime()/1000);
+        let unixDate = Math.round(date.getTime()/1000);
 
         return unixDate;
     }
@@ -28,7 +36,7 @@ function getData() {
     // Start date to UNIXTIMESTAMP Start date.
     let startDateUnix = getUnixDate(startDate.value);
 
-    // End date gets extra 3600 seconds, to get datapoints closest to midnight.
+    // End date gets extra 3600 seconds, to get datapoints close to midnight.
     let endDateUnix = getUnixDate(endDate.value) + 3600;
 
     // Simple function that returns the API URL (Coingecko)
@@ -61,62 +69,77 @@ function getData() {
 }
 
 // The responseObject holds the data received from API
-// in following form: responseObject.prices Array (2) [UNIXTIMESTAMP, BITCOINPRICE]
-//                    responseObject.market_caps Array (2) [UNIXTIMESTAMP, MARKET_CAPS]
-//                    responseObject.total_volumes Array (2) [UNIXTIMESTAMP, TOTAL_VOLUMES]
+// in following categories: responseObject.prices Array (2) [UNIXTIMESTAMP, BITCOINPRICE]
+//                          responseObject.market_caps Array (2) [UNIXTIMESTAMP, MARKET_CAPS]
+//                          responseObject.total_volumes Array (2) [UNIXTIMESTAMP, TOTAL_VOLUMES]
 
 // Correct datapoint(closest to midnight) for each day.
-function getCorrectDatapoint(responseObject) {
+function getCorrectDatapoints() {
 
-    let datapointArray = [];
-    let correctDatapoint = 0;
+    let arr = responseObject.prices;
+    let dpArr = [];
 
-    for (let i = 0; i < responseObject.prices.length; i++) {
+    // first unixtimestamp: console.log(arr[0][0]);
+    // first price: console.log(arr[0][1]);
 
-        let thisDate = new Date(responseObject.prices[i][0]);
+    for (let i = 0; i < arr.length; i++) {
 
-        if (responseObject.prices[i+1] != undefined) {
+        let date = new Date(arr[i][0]);
 
-            let nextDate = new Date(responseObject.prices[i+1][0]);
+        // Last datapoint is the correct datapoint for last day.
+        if (i === (arr.length -1)) {
 
-            // The last data point is the closest to midnight and
-            // thus it is the correct data point. If the next date
-            // is still the same day, we get to the last data point
-            // of the day eventually. We want UTC time.
-            if (thisDate.getUTCDay() === nextDate.getUTCDay() &&
-            thisDate.getUTCMonth() === nextDate.getUTCMonth() &&
-            thisDate.getUTCFullYear() === nextDate.getUTCFullYear()) {
+            dpArr.push(i);
+            console.log("Added last datapoint: " + date);
+        } else if ((i+1) <= (arr.length -1)) {
 
-                correctDatapoint = i+1;
-            } else {
+            let dateNext = new Date(arr[i+1][0]);
 
-                datapointArray.push(correctDatapoint);
+            // If current date is different than nextDate,
+            // current date is correct datapoint (closest to midnight)
+            if (date.getUTCDay() !== dateNext.getUTCDay()) {
+
+                dpArr.push(i);
+                console.log("Added datapoint: " + date);
             }
-        } else {
-            correctDatapoint = i;
-            datapointArray.push(correctDatapoint);
         }
     }
-
-    return datapointArray;
+    // Returns the datapoint array with correct datapoints.
+    return dpArr;
 }
 
-// Testing the dataPointArray[]
+// Checking all datapoints.
+function testAllDatapoints() {
+    let allDP = responseObject.prices;
 
-function datapointTest() {
+    for (let i = 0; i < allDP.length; i++) {
 
-    let datapointArray = getCorrectDatapoint(responseObject);
-    // console.log(datapointArray);
-
-    datapointArray.forEach(showPriceData);
-
-    function showPriceData(i) {
-
-        let thisDate = new Date(responseObject.prices[i][0]);
-        let thisPrice = responseObject.prices[i][1];
-        console.log("Date: " + thisDate + " Price: " + thisPrice);
+        let date = new Date(allDP[i][0]);
+        console.log(date);
     }
 }
+
+// Testing the dpArr.
+function datapointTest() {
+
+    let dpArr = getCorrectDatapoints();
+    let origArr = responseObject.prices;
+    // console.log(datapointArray);
+
+    for (let i = 0; i < dpArr.length; i++) {
+        let j = dpArr[i];
+
+        let date = new Date(origArr[j][0]);
+        let value = origArr[j][1];
+
+        // Datapoint date
+        console.log("Date: " + date);
+
+        // Datapoint price
+        console.log("Price: " + value);
+    }
+}
+
 
 // We need a function to find out,
 // what is the longest downward trend in bitcoin's
