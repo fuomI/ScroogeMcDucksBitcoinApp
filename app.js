@@ -1,11 +1,4 @@
-// Year 2021 is given as default interval.
-let startDate = document.getElementById("startDate");
-startDate.value = '2021-01-01';
-
-let endDate = document.getElementById("endDate");
-endDate.value = '2021-12-31';
-
-// responseObject to hold data from API.
+// Declaring the responseObject to hold API data.
 let responseObject = {};
 
 // Get data using datepicker's inputs.
@@ -35,7 +28,7 @@ function getData() {
     // Start date to UNIXTIMESTAMP Start date.
     let startDateUnix = getUnixDate(startDate.value);
 
-    // End date gets extra 3600 seconds, to get datapoints close to midnight.
+    // End date gets extra 3600 seconds to ensure that we get the datapoint for last day also.
     let endDateUnix = getUnixDate(endDate.value) + 3600;
 
     // Simple function that returns the API URL (Coingecko)
@@ -62,7 +55,6 @@ function getData() {
 
             // We use JSON.parse to change String to an object.
             responseObject = JSON.parse(xmlhttp.responseText);
-            console.log(responseObject);
         }
     }
 }
@@ -107,28 +99,10 @@ function getValidDatapoints() {
     return dpObj;
 }
 
-// Checking the date and price of valid datapoints.
-function datapointTest() {
-
-    let dpObj = getValidDatapoints();
-    let dateArr = dpObj.dateArr;
-    let priceArr = dpObj.priceArr;
-
-    for (let i = 0; i < dateArr.length; i++) {
-
-        let date = dateArr[i];
-        let value = priceArr[i];
-
-        // Datapoint date
-        console.log("Date: " + date);
-
-        // Datapoint price
-        console.log("Price: " + value);
-    }
-}
-
-// Longest downward trend is most consecutive days of price going down.
+// Longest downward trend is the most consecutive number of days in which price is going down.
 function dwTrend() {
+
+    let resultsDiv = document.getElementById("resultsDiv");
 
     let dpObj = getValidDatapoints();
     let dateArr = dpObj.dateArr;
@@ -149,17 +123,19 @@ function dwTrend() {
         let priceYd = priceArr[i-1];
 
         if (price > priceYd && arr.length > dwArr.length) {
-            console.log (price + " is bigger than " + priceYd);
             dwArr = arr;
             arr = [];
         } else if (price > priceYd) {
-            console.log (price + " is bigger than " + priceYd);
             arr = [];
         } else {
-            console.log (price + " is smaller than " + priceYd);
             arr.push(i);
-            console.log(arr);
         }
+    }
+
+    // If there is no downward trend, return.
+    if (dwArr.length === 0) {
+        resultsDiv.innerHTML = "There was no downward trend for the given time interval."
+        return;
     }
 
     // Populating dwPriceArr[] and dwDateArr[].
@@ -177,58 +153,99 @@ function dwTrend() {
     return dwObj;
 }
 
-// Checking the date and price of datapoints in longest downward trend.
-function datapointTestDW() {
+// Process data and return the longest downward trend as a string.
+function dwResults() {
 
-    let dwObj = dwTrend();
-    let dwDateArr = dwObj.dwDateArr;
-    let dwPriceArr = dwObj.dwPriceArr;
+    // Date input values.
+    let startDateValue = document.getElementById("startDate").value;
+    let endDateValue = document.getElementById("endDate").value;
 
-    for (let i = 0; i < dwDateArr.length; i++) {
+    // Get the longest downward trend.
+    let dwObj = dwTrend()
 
-        let date = dwDateArr[i];
-        let value = dwPriceArr[i];
+    let dwDates = dwObj.dwDateArr;
+    let dwPrices = dwObj.dwPriceArr;
 
-        // Datapoint date
-        console.log("Date: " + date);
+    // dwEndDate index (works with price also):
+    let j = dwDates.length - 1;
 
-        // Datapoint price
-        console.log("Price: " + value);
-    }
+    // Datapoints are in some cases from 0:00 UTC, so we need to
+    // refer to start date as start date-1 and end date as end date-1.
+    let dwStartDate = dwDates[0];
+    let dwEndDate = dwDates[j];
+    let correctStartDate = new Date(dwStartDate);
+    let correctEndDate = new Date(dwEndDate);
+    correctStartDate.setDate(correctStartDate.getDate() -1);
+    correctEndDate.setDate(correctEndDate.getDate() -1);
+
+    // dwDates to more-easy-to-read format.
+    dwStartDate = correctStartDate.toISOString().substring(0, 10);
+    dwEndDate = correctEndDate.toISOString().substring(0, 10);
+
+    // Prices of the first and last day rounded to 2 decimals.
+    let dwFirstPrice = dwPrices[0].toFixed(2);
+    let dwLastPrice = dwPrices[j].toFixed(2);
+    let valueDrop = (dwPrices[0]-dwPrices[j]).toFixed(2);
+
+    let dwPrint = "";
+
+    dwPrint += "The longest downward trend of bitcoin:"
+    dwPrint += "<br><br>";
+    dwPrint += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b>";
+    dwPrint += "<br>";
+    dwPrint += "Length of the downward trend: <b>" + dwDates.length + "</b> day(s)";
+    dwPrint += "<br>";
+    dwPrint += "First day of the downward trend: <b>" + dwStartDate + "</b>";
+    dwPrint += "<br>";
+    dwPrint += "Last day of the downward trend: <b>" + dwEndDate + "</b>";
+    dwPrint += "<br>";
+    dwPrint += "Price of the first day: <b>" + dwFirstPrice + " €</b>";
+    dwPrint += "<br>";
+    dwPrint += "Price of the first day: <b>" + dwLastPrice + " €</b>";
+    dwPrint += "<br>"
+    dwPrint += "The drop in value: <b>" + valueDrop + " €</b>";
+
+    return dwPrint;
 }
-    /* Presenting the data:
-    let dwIndexLength = dwIndexesLongest.length;
-    let dwStartDate = new Date(obj.prices[dwIndexesLongest[0]][0]);
-    let dwEndDate = new Date(obj.prices[dwIndexesLongest[dwIndexLength-1]][0]);
 
-    console.log(dwStartDate);
-    console.log(dwEndDate);
+// Transforms string to date.
+function transformToDate(dateString) {
 
-    let dwStart = dwStartDate.toISOString().substring(0, 10);
+    let dateArray = dateString.split("-");
 
-    let dwEnd = dwEndDate.toISOString().substring(0, 10);
+    // We want to make sure that we use UTC time, because Coingecko API does.
+    let date = new Date(Date.UTC(dateArray[0], (dateArray[1] - 1),
+    dateArray[2], '23', '00', '00'));
 
-    longestDWTrend += "<p> The longest downward trend of bitcoin";
-    longestDWTrend += " from " + startDateValue + " to " + endDateValue + " "
-    longestDWTrend += "was <b>" + dwDaysLongest + "</b> days ";
-    longestDWTrend += "during the time between " + dwStart + " and " + dwEnd + "</p>";
+    return date;
+}
 
-    return longestDWTrend; */
-
-
-// Setting event listener
+// Setting event listener to the "get results" -button.
 document.getElementById("submitBtn").addEventListener("click", function () {
 
-    console.log("hello world");
+    let startDateDefault = document.getElementById("startDate").defaultValue;
+    let endDateDefault = document.getElementById("startDate").defaultValue;
+    let endDateValue = document.getElementById("endDate").value;
+    let startDateValue = document.getElementById("startDate").value;
+    let startDate = transformToDate(startDateValue);
+    let endDate = transformToDate(endDateValue);
+    let resultsDiv = document.getElementById("resultsDiv");
 
-    let result = "";
-
-    let dwTrend = document.getElementById("downwardTrend");
-
-    if (dwTrend.checked == true) {
-        result += longestDownwardTrend(responseObject);
+    if (startDate >= endDate) {
+        resultsDiv.innerHTML = "Start date must be before end date!";
+        return;
+    } else if (startDateValue === startDateDefault || endDateValue === endDateDefault) {
+        resultsDiv.innerHTML = "Start date and end date must be picked!";
+        return;
     }
 
-    document.getElementById("resultsDiv").innerHTML = result;
-});
+    // Get data from API.
+    getData();
 
+    let dwResult = dwResults();
+    let dwTrend = document.getElementById("downwardTrend");
+
+    if (dwTrend.checked === true) {
+        resultsDiv.innerHTML = dwResult;
+    }
+});

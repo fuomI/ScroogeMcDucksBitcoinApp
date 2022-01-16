@@ -1,4 +1,3 @@
-
 // Testing the dpArr.
 function datapointTest() {
 
@@ -23,14 +22,14 @@ function datapointTest() {
 // Checking the date and price of datapoints in longest downward trend.
 function datapointTestDW() {
 
-    let dpArr = dwTrend();
-    let origObj = responseObject.prices;
+    let dwObj = dwTrend();
+    let dwDateArr = dwObj.dwDateArr;
+    let dwPriceArr = dwObj.dwPriceArr;
 
-    for (let i = 0; i < dpArr.length; i++) {
+    for (let i = 0; i < dwDateArr.length; i++) {
 
-        let j = dpArr[i];
-        let date = new Date(origObj[j][0]);
-        let value = origObj[j][1];
+        let date = dwDateArr[i];
+        let value = dwPriceArr[i];
 
         // Datapoint date
         console.log("Date: " + date);
