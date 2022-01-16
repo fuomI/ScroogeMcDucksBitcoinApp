@@ -1,12 +1,11 @@
-// Let's give startDate and endDate some values right at start
-// to make our testing process faster.
+// Year 2021 is given as default interval.
 let startDate = document.getElementById("startDate");
-startDate.value = '2020-01-01';
+startDate.value = '2021-01-01';
 
 let endDate = document.getElementById("endDate");
-endDate.value = '2020-01-30';
+endDate.value = '2021-12-31';
 
-// responseObject to hold JSON data from API.
+// responseObject to hold data from API.
 let responseObject = {};
 
 // Get data using datepicker's inputs.
@@ -101,6 +100,7 @@ function getValidDatapoints() {
             }
         }
     }
+    // dpObj holds the dates and prices of valid datapoints.
     let dpObj = {dateArr, priceArr};
 
     // Returns the object with correct datapoints.
@@ -130,18 +130,23 @@ function datapointTest() {
 // Longest downward trend is most consecutive days of price going down.
 function dwTrend() {
 
-    let dpArr = getValidDatapoints();
-    let obj = responseObject.prices;
+    let dpObj = getValidDatapoints();
+    let dateArr = dpObj.dateArr;
+    let priceArr = dpObj.priceArr;
 
+    // Temporary array to hold indexes of the longest downward trend.
     let dwArr = [];
+    // Temporary array for comparing stretches.
     let arr = [];
+    // Array for prices in the longest downward trend.
+    let dwPriceArr = [];
+    // Array for dates in the longest downward trend.
+    let dwDateArr = [];
 
-    for (let i = 1; i < dpArr.length; i++) {
+    for (let i = 1; i < priceArr.length; i++) {
 
-        let j = dpArr[i];
-
-        let price = obj[j][1];
-        let priceYd = obj[j-1][1];
+        let price = priceArr[i];
+        let priceYd = priceArr[i-1];
 
         if (price > priceYd && arr.length > dwArr.length) {
             console.log (price + " is bigger than " + priceYd);
@@ -152,24 +157,37 @@ function dwTrend() {
             arr = [];
         } else {
             console.log (price + " is smaller than " + priceYd);
-            arr.push(j);
+            arr.push(i);
             console.log(arr);
         }
     }
-    return dwArr;
+
+    // Populating dwPriceArr[] and dwDateArr[].
+    for (let i = 0; i < dwArr.length; i++) {
+
+        let j = dwArr[i];
+
+        dwPriceArr.push(priceArr[j]);
+        dwDateArr.push(dateArr[j]);
+    }
+
+    // dwObj holds dates and prices of the longest downward trend.
+    let dwObj = {dwDateArr, dwPriceArr};
+
+    return dwObj;
 }
 
 // Checking the date and price of datapoints in longest downward trend.
 function datapointTestDW() {
 
-    let dpArr = dwTrend();
-    let origObj = responseObject.prices;
+    let dwObj = dwTrend();
+    let dwDateArr = dwObj.dwDateArr;
+    let dwPriceArr = dwObj.dwPriceArr;
 
-    for (let i = 0; i < dpArr.length; i++) {
+    for (let i = 0; i < dwDateArr.length; i++) {
 
-        let j = dpArr[i];
-        let date = new Date(origObj[j][0]);
-        let value = origObj[j][1];
+        let date = dwDateArr[i];
+        let value = dwPriceArr[i];
 
         // Datapoint date
         console.log("Date: " + date);
