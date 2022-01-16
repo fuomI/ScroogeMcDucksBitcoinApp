@@ -107,27 +107,17 @@ function getValidDatapoints() {
     return dpObj;
 }
 
-// Checking dates of all datapoints.
-function testAllDatapoints() {
-
-    let allDP = responseObject.prices;
-
-    for (let i = 0; i < allDP.length; i++) {
-
-        let date = new Date(allDP[i][0]);
-        console.log(date);
-    }
-}
-
 // Checking the date and price of valid datapoints.
 function datapointTest() {
 
     let dpObj = getValidDatapoints();
+    let dateArr = dpObj.dateArr;
+    let priceArr = dpObj.priceArr;
 
-    for (let i = 0; i < dpObj.length; i++) {
+    for (let i = 0; i < dateArr.length; i++) {
 
-        let date = dpObj.dateArr[i];
-        let value = dpObj.priceArr[i];
+        let date = dateArr[i];
+        let value = priceArr[i];
 
         // Datapoint date
         console.log("Date: " + date);

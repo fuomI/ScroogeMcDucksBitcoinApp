@@ -1,13 +1,3 @@
-// Checking all datapoints.
-function testAllDataPoints() {
-    let allDP = responseObject.prices;
-
-    for (let i = 0; i < allDP.length; i++) {
-
-        let date = new Date(allDP[i][0]);
-        console.log(date);
-    }
-}
 
 // Testing the dpArr.
 function datapointTest() {
