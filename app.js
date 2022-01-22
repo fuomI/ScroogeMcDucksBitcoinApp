@@ -1,6 +1,6 @@
 
 document.getElementById("startDate").value = "2021-01-01";
-document.getElementById("endDate").value = "2021-12-30";
+document.getElementById("endDate").value = "2021-01-30";
 
 // Create API URL and return it.
 function createURL() {
@@ -42,7 +42,7 @@ function createURL() {
 // responseObject to hold data from API
 let responseObject = {};
 
-// Get data using datepicker's inputs.
+// Get data from API using XMLHttpRequest.
 function getData() {
 
     // API URL with desired interval.
@@ -160,10 +160,6 @@ function dwTrend() {
 
 // Process data and return the longest downward trend as a string.
 function dwResults() {
-
-    // Date input values.
-    let startDateValue = document.getElementById("startDate").value;
-    let endDateValue = document.getElementById("endDate").value;
 
     // Get the longest downward trend.
     let dwObj = dwTrend()
@@ -308,10 +304,6 @@ function highestVolume() {
 // Returns the date and highest trading volume of that date as a string.
 function hvResults() {
 
-    // Date input values.
-    let startDateValue = document.getElementById("startDate").value;
-    let endDateValue = document.getElementById("endDate").value;
-
     // Get the date when the highest volume of trading occurred and the volume.
     let hvArr = highestVolume();
 
@@ -346,6 +338,64 @@ function hvResults() {
     return hvPrint;
 }
 
+// Time machine exploit: In which day should one purchase bitcoins,
+// and in which day should one sell bitcoins during the interval
+// for maximized profit?
+function tmExploit() {
+
+    let resultsDiv = document.getElementById("resultsDiv");
+
+    let dpObj = getValidPriceDatapoints();
+
+    let dateArr = dpObj.dateArr;
+    let priceArr = dpObj.priceArr;
+
+    let buyDateIndex = 0;
+    let sellDateIndex = 0;
+    let bestProfit = 0;
+
+    for (let i = 0; i < dateArr.length; i++) {
+
+        // We check one price / date at a time.
+        let price = priceArr[i];
+
+        if (dateArr[i+1] !== undefined) {
+
+            // j starts as i +1, because we are interested in future points only.
+            for (let j = i + 1; j < dateArr.length; j++) {
+
+                let comparablePrice = priceArr[j];
+
+                // Erasing comparablePrice(price next day) from price,
+                // and multiplying by -1 to show profit as a positive number.
+                let profit = (price - comparablePrice) * -1;
+
+                if (profit > bestProfit) {
+                    bestProfit = profit;
+                    buyDateIndex = i;
+                    sellDateIndex = j;
+                }
+            }
+        }
+    }
+
+    if (buyDateIndex === 0 && sellDateIndex === 0 && bestProfit === 0) {
+        resultsDiv.innerHTML += "<br>For the given time interval, there is no use for time machine exploit,<br>" +
+        "because there is no opportunity for profiting.<br>"
+    }
+
+    // Get buyDate and sellDate from dateArr based on correct indexes.
+    let buyDate = dateArr[buyDateIndex];
+    let sellDate = dateArr[sellDateIndex];
+
+    // exploitArr holds the buyDate(0), sellDate(1), and profit(2).
+    let exploitArr = [buyDate, sellDate, bestProfit];
+
+    console.log(exploitArr);
+
+    return exploitArr;
+}
+
 // Transforms string to date.
 function transformToDate(dateString) {
 
@@ -358,7 +408,7 @@ function transformToDate(dateString) {
     return date;
 }
 
-// Setting event listener to the "get results" -button.
+// Setting event listener to the "Get results" -button.
 document.getElementById("submitBtn").addEventListener("click", function () {
 
     let startDateDefault = document.getElementById("startDate").defaultValue;
