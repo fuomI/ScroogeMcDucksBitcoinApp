@@ -72,7 +72,7 @@ function getData() {
 // Correct price datapoint(closest to midnight) for each day.
 function getValidPriceDatapoints() {
 
-    let obj = responseObject;
+    let obj = responseObject.prices;
     let dateArr = [];
     let priceArr = [];
 
@@ -180,19 +180,24 @@ function dwResults() {
     let dwEndDate = dwDates[j];
     let correctStartDate = new Date(dwStartDate);
     let correctEndDate = new Date(dwEndDate);
+
     correctStartDate.setDate(correctStartDate.getDate() -1);
     correctEndDate.setDate(correctEndDate.getDate() -1);
 
     // dwDates to more-easy-to-read format.
     if (dwStartDate.getUTCHours === 0) {
+
         dwStartDate = correctStartDate.toISOString().substring(0, 10);
     } else {
+
         dwStartDate = dwStartDate.toISOString().substring(0, 10);
     }
 
     if (dwEndDate.getUTCHours === 0) {
+
         dwEndDate = correctEndDate.toISOString().substring(0, 10);
     } else {
+
         dwEndDate = dwEndDate.toISOString().substring(0, 10);
     }
 
@@ -206,8 +211,6 @@ function dwResults() {
     dwPrint += "<br>";
     dwPrint += "The longest downward trend of bitcoin:"
     dwPrint += "<br><br>";
-    dwPrint += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b>";
-    dwPrint += "<br>";
     dwPrint += "Length of the downward trend: <b>" + dwDates.length + "</b> day(s)";
     dwPrint += "<br>";
     dwPrint += "First day of the downward trend: <b>" + dwStartDate + "</b>";
@@ -316,14 +319,15 @@ function hvResults() {
     // refer to date as date -1.
     let date = hvArr[0];
     let correctDate = new Date(date);
+
     correctDate.setDate(correctDate.getDate() -1);
 
     if (date.getUTCHours() === 0) {
+
         date = correctDate.toISOString().substring(0, 10);
-        console.log(date + "minus one");
     } else {
+
         date = date.toISOString().substring(0, 10);
-        console.log(date + "original");
     }
 
     // Total trading volume rounded to 2 decimals.
@@ -331,25 +335,15 @@ function hvResults() {
 
     let hvPrint = "";
 
-    /*
     hvPrint += "<br>";
-    hvPrint += "The longest downward trend of bitcoin:"
+    hvPrint += "The highest trading volume (in €) of bitcoin:"
     hvPrint += "<br><br>";
-    hvPrint += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b>";
+    hvPrint += "The date: <b>" + date + "</b>";
     hvPrint += "<br>";
-    hvPrint += "Length of the downward trend: <b>" + dwDates.length + "</b> day(s)";
+    hvPrint += "Total trading volume (€): <b>" + volume + " €</b>";
     hvPrint += "<br>";
-    hvPrint += "First day of the downward trend: <b>" + dwStartDate + "</b>";
-    hvPrint += "<br>";
-    hvPrint += "Last day of the downward trend: <b>" + dwEndDate + "</b>";
-    hvPrint += "<br>";
-    hvPrint += "Price of the first day: <b>" + dwFirstPrice + " €</b>";
-    hvPrint += "<br>";
-    hvPrint += "Price of the first day: <b>" + dwLastPrice + " €</b>";
-    hvPrint += "<br>"
-    hvPrint += "The drop in value: <b>" + valueDrop + " €</b>";
-    hvPrint += "<br>";
-    */
+
+    return hvPrint;
 }
 
 // Transforms string to date.
@@ -390,15 +384,24 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     getData();
 
     let dwTrend = document.getElementById("downwardTrend");
+    let htVolume = document.getElementById("highestTradingVolume");
 
     // Wait 300 ms and then check search options
     setTimeout(searchOptions, 300);
 
     function searchOptions() {
+
+        resultsDiv.innerHTML += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b><br>"
+
         if (dwTrend.checked === true) {
+
             let dwResult = dwResults();
             resultsDiv.innerHTML += dwResult;
         }
-    }
 
+        if (htVolume.checked === true) {
+            let hvResult = hvResults();
+            resultsDiv.innerHTML += hvResult;
+        }
+    }
 });

@@ -1,21 +1,21 @@
-// Testing the dpArr.
+// Checking the date and price (in €) of valid price datapoints.
 function datapointTest() {
 
-    let dpArr = getCorrectDatapoints();
-    let origArr = responseObject.prices;
-    // console.log(datapointArray);
+    let dpObj = getValidPriceDatapoints();
 
-    for (let i = 0; i < dpArr.length; i++) {
-        let j = dpArr[i];
+    let dateArr = dpObj.dateArr;
+    let priceArr = dpObj.priceArr;
 
-        let date = new Date(origArr[j][0]);
-        let value = origArr[j][1];
+    for (let i = 0; i < dateArr.length; i++) {
+
+        let date = dateArr[i];
+        let price = priceArr[i];
 
         // Datapoint date
         console.log("Date: " + date);
 
-        // Datapoint price
-        console.log("Price: " + value);
+        // Datapoint trading volume
+        console.log("Price: " + price);
     }
 }
 
