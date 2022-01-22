@@ -1,8 +1,9 @@
-// Declaring the responseObject to hold API data.
-let responseObject = {};
 
-// Get data using datepicker's inputs.
-function getData() {
+document.getElementById("startDate").value = "2021-01-01";
+document.getElementById("endDate").value = "2022-01-01";
+
+// Create API URL and return it.
+function createURL() {
 
     // Initializing startDate and endDate.
     let startDate = document.getElementById("startDate");
@@ -31,17 +32,22 @@ function getData() {
     // End date gets extra 3600 seconds to ensure that we get the datapoint for last day also.
     let endDateUnix = getUnixDate(endDate.value) + 3600;
 
-    // Simple function that returns the API URL (Coingecko)
-    function getURL(startDateUnix, endDateUnix) {
+    // Return apiURL
 
-        let apiURL = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from=" +
-        startDateUnix + "&to=" + endDateUnix;
+    let apiURL = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from=" +
+    startDateUnix + "&to=" + endDateUnix;
 
-        return apiURL;
-    }
+    return apiURL;
+}
+
+// responseObject to hold data from API
+let responseObject = {};
+
+// Get data using datepicker's inputs.
+function getData() {
 
     // API URL with desired interval.
-    let apiURL = getURL(startDateUnix, endDateUnix);
+    let apiURL = createURL();
 
     // XMLHttpRequest (GET) to the API.
     let xmlhttp = new XMLHttpRequest();
@@ -189,6 +195,7 @@ function dwResults() {
 
     let dwPrint = "";
 
+    dwPrint += "<br>";
     dwPrint += "The longest downward trend of bitcoin:"
     dwPrint += "<br><br>";
     dwPrint += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b>";
@@ -204,6 +211,7 @@ function dwResults() {
     dwPrint += "Price of the first day: <b>" + dwLastPrice + " €</b>";
     dwPrint += "<br>"
     dwPrint += "The drop in value: <b>" + valueDrop + " €</b>";
+    dwPrint += "<br>";
 
     return dwPrint;
 }
@@ -231,6 +239,9 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     let endDate = transformToDate(endDateValue);
     let resultsDiv = document.getElementById("resultsDiv");
 
+    // Empty resultsDiv before new results are shown:
+    resultsDiv.innerHTML = "";
+
     if (startDate >= endDate) {
         resultsDiv.innerHTML = "Start date must be before end date!";
         return;
@@ -239,13 +250,19 @@ document.getElementById("submitBtn").addEventListener("click", function () {
         return;
     }
 
-    // Get data from API.
+    // Get API data
     getData();
 
-    let dwResult = dwResults();
     let dwTrend = document.getElementById("downwardTrend");
 
-    if (dwTrend.checked === true) {
-        resultsDiv.innerHTML = dwResult;
+    // Wait 300 ms and then check search options
+    setTimeout(searchOptions, 300);
+
+    function searchOptions() {
+        if (dwTrend.checked === true) {
+            let dwResult = dwResults();
+            resultsDiv.innerHTML += dwResult;
+        }
     }
+
 });
