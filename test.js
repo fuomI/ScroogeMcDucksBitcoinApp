@@ -38,3 +38,24 @@ function datapointTestDW() {
         console.log("Price: " + value);
     }
 }
+
+// Checking the date and total_volume (in €) of valid volume datapoints.
+function volumeDPtest() {
+
+    let dpObj = getValidVolumeDatapoints();
+
+    let dateArr = dpObj.dateArr;
+    let volumeArr = dpObj.volumeArr;
+
+    for (let i = 0; i < dateArr.length; i++) {
+
+        let date = dateArr[i];
+        let volume = volumeArr[i];
+
+        // Datapoint date
+        console.log("Date: " + date);
+
+        // Datapoint trading volume
+        console.log("Price: " + volume);
+    }
+}

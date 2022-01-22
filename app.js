@@ -1,6 +1,6 @@
 
 document.getElementById("startDate").value = "2021-01-01";
-document.getElementById("endDate").value = "2022-01-01";
+document.getElementById("endDate").value = "2021-12-30";
 
 // Create API URL and return it.
 function createURL() {
@@ -29,11 +29,10 @@ function createURL() {
     // Start date to UNIXTIMESTAMP Start date.
     let startDateUnix = getUnixDate(startDate.value);
 
-    // End date gets extra 3600 seconds to ensure that we get the datapoint for last day also.
+    // End date gets extra 3600 seconds to ensure that we get the datapoint for the last day also.
     let endDateUnix = getUnixDate(endDate.value) + 3600;
 
     // Return apiURL
-
     let apiURL = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from=" +
     startDateUnix + "&to=" + endDateUnix;
 
@@ -70,10 +69,10 @@ function getData() {
 //                          responseObject.market_caps Array (2) [UNIXTIMESTAMP, MARKET_CAPS]
 //                          responseObject.total_volumes Array (2) [UNIXTIMESTAMP, TOTAL_VOLUMES]
 
-// Correct datapoint(closest to midnight) for each day.
-function getValidDatapoints() {
+// Correct price datapoint(closest to midnight) for each day.
+function getValidPriceDatapoints() {
 
-    let obj = responseObject.prices;
+    let obj = responseObject;
     let dateArr = [];
     let priceArr = [];
 
@@ -110,7 +109,7 @@ function dwTrend() {
 
     let resultsDiv = document.getElementById("resultsDiv");
 
-    let dpObj = getValidDatapoints();
+    let dpObj = getValidPriceDatapoints();
     let dateArr = dpObj.dateArr;
     let priceArr = dpObj.priceArr;
 
@@ -175,7 +174,7 @@ function dwResults() {
     // dwEndDate index (works with price also):
     let j = dwDates.length - 1;
 
-    // Datapoints are in some cases from 0:00 UTC, so we need to
+    // Datapoints are in some cases from 0:00 UTC, so we might need to
     // refer to start date as start date-1 and end date as end date-1.
     let dwStartDate = dwDates[0];
     let dwEndDate = dwDates[j];
@@ -185,8 +184,17 @@ function dwResults() {
     correctEndDate.setDate(correctEndDate.getDate() -1);
 
     // dwDates to more-easy-to-read format.
-    dwStartDate = correctStartDate.toISOString().substring(0, 10);
-    dwEndDate = correctEndDate.toISOString().substring(0, 10);
+    if (dwStartDate.getUTCHours === 0) {
+        dwStartDate = correctStartDate.toISOString().substring(0, 10);
+    } else {
+        dwStartDate = dwStartDate.toISOString().substring(0, 10);
+    }
+
+    if (dwEndDate.getUTCHours === 0) {
+        dwEndDate = correctEndDate.toISOString().substring(0, 10);
+    } else {
+        dwEndDate = dwEndDate.toISOString().substring(0, 10);
+    }
 
     // Prices of the first and last day rounded to 2 decimals.
     let dwFirstPrice = dwPrices[0].toFixed(2);
@@ -214,6 +222,134 @@ function dwResults() {
     dwPrint += "<br>";
 
     return dwPrint;
+}
+
+// The responseObject holds the data received from API
+// in following categories: responseObject.prices Array (2) [UNIXTIMESTAMP, BITCOINPRICE]
+//                          responseObject.market_caps Array (2) [UNIXTIMESTAMP, MARKET_CAPS]
+//                          responseObject.total_volumes Array (2) [UNIXTIMESTAMP, TOTAL_VOLUMES]
+
+// Correct total_volumes datapoint(closest to midnight) for each day.
+function getValidVolumeDatapoints() {
+
+    let obj = responseObject.total_volumes;
+    let dateArr = [];
+    let volumeArr = [];
+
+    for (let i = 0; i < obj.length; i++) {
+
+        let volume = obj[i][1];
+        let date = new Date(obj[i][0]);
+
+        // Last datapoint is the correct datapoint for last day.
+        if (i === (obj.length -1)) {
+            dateArr.push(date);
+            volumeArr.push(volume);
+        } else if ((i+1) <= (obj.length -1)) {
+
+            let dateNext = new Date(obj[i+1][0]);
+
+            // If current date is different than nextDate,
+            // current date is correct datapoint (closest to midnight)
+            if (date.getUTCDay() !== dateNext.getUTCDay()) {
+                dateArr.push(date);
+                volumeArr.push(volume);
+            }
+        }
+    }
+    // dpObj holds the dates and prices of valid datapoints.
+    let dpObj = {dateArr, volumeArr};
+
+    console.log(dpObj);
+
+    // Returns the object with correct datapoints.
+    return dpObj;
+}
+
+// Which date has the biggest trading volume in €.
+function highestVolume() {
+
+    let dpObj = getValidVolumeDatapoints();
+
+    let dateArr = dpObj.dateArr;
+    let volumeArr = dpObj.volumeArr;
+
+    // highestVolume array, index 0 = date, index 1 = volume (in €).
+    let hvArr = [];
+
+    for (let i = 0; i < dateArr.length; i++) {
+
+        let date  = dateArr[i];
+        let volume = volumeArr[i];
+
+        // Store first date and trading volume to the highestVolume array
+        if (i === 0) {
+
+            hvArr.push(date);
+            hvArr.push(volume);
+        } else {
+
+            // If current loop's volume is bigger, replace
+            if (volume > hvArr[1]) {
+
+                hvArr = [];
+                hvArr.push(date);
+                hvArr.push(volume);
+            }
+        }
+    }
+
+    return hvArr;
+}
+
+// Returns the date and highest trading volume of that date as a string.
+function hvResults() {
+
+    // Date input values.
+    let startDateValue = document.getElementById("startDate").value;
+    let endDateValue = document.getElementById("endDate").value;
+
+    // Get the date when the highest volume of trading occurred and the volume.
+    let hvArr = highestVolume();
+
+    // Datapoints are in some cases from 0:00 UTC, so we might need to
+    // refer to date as date -1.
+    let date = hvArr[0];
+    let correctDate = new Date(date);
+    correctDate.setDate(correctDate.getDate() -1);
+
+    if (date.getUTCHours() === 0) {
+        date = correctDate.toISOString().substring(0, 10);
+        console.log(date + "minus one");
+    } else {
+        date = date.toISOString().substring(0, 10);
+        console.log(date + "original");
+    }
+
+    // Total trading volume rounded to 2 decimals.
+    let volume = hvArr[1].toFixed(2);
+
+    let hvPrint = "";
+
+    /*
+    hvPrint += "<br>";
+    hvPrint += "The longest downward trend of bitcoin:"
+    hvPrint += "<br><br>";
+    hvPrint += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b>";
+    hvPrint += "<br>";
+    hvPrint += "Length of the downward trend: <b>" + dwDates.length + "</b> day(s)";
+    hvPrint += "<br>";
+    hvPrint += "First day of the downward trend: <b>" + dwStartDate + "</b>";
+    hvPrint += "<br>";
+    hvPrint += "Last day of the downward trend: <b>" + dwEndDate + "</b>";
+    hvPrint += "<br>";
+    hvPrint += "Price of the first day: <b>" + dwFirstPrice + " €</b>";
+    hvPrint += "<br>";
+    hvPrint += "Price of the first day: <b>" + dwLastPrice + " €</b>";
+    hvPrint += "<br>"
+    hvPrint += "The drop in value: <b>" + valueDrop + " €</b>";
+    hvPrint += "<br>";
+    */
 }
 
 // Transforms string to date.
