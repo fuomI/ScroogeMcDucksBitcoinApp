@@ -497,11 +497,11 @@ document.getElementById("submitBtn").addEventListener("click", async function ()
         htVolume.checked === false &&
         tmExploit.checked === false) {
 
-        resultsDiv.innerHTML += "You must choose at least 1 option!"
+        resultsDiv.innerHTML += "You must choose at least 1 option!";
     } else {
 
         resultsDiv.innerHTML += "<span class='optionHeadline'>Time interval: <b>" + startDateValue +
-        "</b> - <b>" + endDateValue + "</b><br></span>"
+        "</b> - <b>" + endDateValue + "</b><br></span>";
     }
 
     if (dwTrend.checked === true) {
