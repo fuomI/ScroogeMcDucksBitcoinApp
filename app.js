@@ -497,7 +497,7 @@ document.getElementById("submitBtn").addEventListener("click", async function ()
         htVolume.checked === false &&
         tmExploit.checked === false) {
 
-        resultsDiv.innerHtML += "You must choose at least 1 option!"
+        resultsDiv.innerHTML += "You must choose at least 1 option!"
     } else {
 
         resultsDiv.innerHTML += "<span class='optionHeadline'>Time interval: <b>" + startDateValue +
