@@ -217,7 +217,7 @@ function dwResults() {
     dwPrint += "<br>";
     dwPrint += "Price of the first day: <b>" + dwFirstPrice + " €</b>";
     dwPrint += "<br>";
-    dwPrint += "Price of the first day: <b>" + dwLastPrice + " €</b>";
+    dwPrint += "Price of the last day: <b>" + dwLastPrice + " €</b>";
     dwPrint += "<br>"
     dwPrint += "The drop in value: <span class='redText'><b>" + valueDrop + "</span> €</b>";
     dwPrint += "<br>";
