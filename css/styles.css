@@ -79,3 +79,15 @@ label {
     margin-right: 1vw;
     margin-left: 1vw;
 }
+
+.optionHeadline {
+    font-size: 18px;
+}
+
+.redText {
+    color: rgb(250, 0, 0);
+}
+
+.greenText {
+    color:rgb(0, 255, 98)
+}

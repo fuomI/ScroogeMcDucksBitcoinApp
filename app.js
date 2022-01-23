@@ -205,7 +205,7 @@ function dwResults() {
     let dwPrint = "";
 
     dwPrint += "<br>";
-    dwPrint += "The longest downward trend of bitcoin:"
+    dwPrint += "<span class='optionHeadline'>The longest downward trend of bitcoin:</span>"
     dwPrint += "<br><br>";
     dwPrint += "Length of the downward trend: <b>" + dwDates.length + "</b> day(s)";
     dwPrint += "<br>";
@@ -217,7 +217,7 @@ function dwResults() {
     dwPrint += "<br>";
     dwPrint += "Price of the first day: <b>" + dwLastPrice + " €</b>";
     dwPrint += "<br>"
-    dwPrint += "The drop in value: <b>" + valueDrop + " €</b>";
+    dwPrint += "The drop in value: <span class='redText'><b>" + valueDrop + "</span> €</b>";
     dwPrint += "<br>";
 
     return dwPrint;
@@ -258,8 +258,6 @@ function getValidVolumeDatapoints() {
     }
     // dpObj holds the dates and prices of valid datapoints.
     let dpObj = {dateArr, volumeArr};
-
-    console.log(dpObj);
 
     // Returns the object with correct datapoints.
     return dpObj;
@@ -328,7 +326,7 @@ function hvResults() {
     let hvPrint = "";
 
     hvPrint += "<br>";
-    hvPrint += "The highest trading volume (in €) of bitcoin:"
+    hvPrint += "<span class='optionHeadline'>The highest trading volume (in €) of bitcoin:</span>"
     hvPrint += "<br><br>";
     hvPrint += "The date: <b>" + date + "</b>";
     hvPrint += "<br>";
@@ -431,27 +429,20 @@ function tmeResults() {
     let _10BCprofit = (exploitArr[2] * 10).toFixed(2);
     let _100BCprofit = (exploitArr[2] * 100).toFixed(2);
 
-    console.log("Buy date: " + buyDate);
-    console.log("Sell date: " + sellDate);
-    console.log("1BC profit: " + _1BCprofit);
-    console.log("10BC profit: " + _10BCprofit);
-    console.log("100BC profit: " + _100BCprofit);
-
-
     let tmePrint = "";
 
     tmePrint += "<br>";
-    tmePrint += "The time machine exploit (highest profit possible):"
+    tmePrint += "<span class='optionHeadline'>The time machine exploit (highest profit possible):</span>"
     tmePrint += "<br><br>";
     tmePrint += "When to buy: <b>" + buyDate + "</b>";
     tmePrint += "<br>";
     tmePrint += "When to sell: <b>" + sellDate + "</b>";
     tmePrint += "<br>";
-    tmePrint += "Profit with 1 bitcoin (€): <b>" + _1BCprofit + " €</b>";
+    tmePrint += "Profit with 1 bitcoin (€): <span class='greenText'><b>" + _1BCprofit + "</span> €</b>";
     tmePrint += "<br>";
-    tmePrint += "Profit with 10 bitcoin (€): <b>" + _10BCprofit + " €</b>";
+    tmePrint += "Profit with 10 bitcoin (€): <span class='greenText'><b>" + _10BCprofit + "</span> €</b>";
     tmePrint += "<br>";
-    tmePrint += "Profit with 100 bitcoin (€): <b>" + _100BCprofit + " €</b>";
+    tmePrint += "Profit with 100 bitcoin (€): <span class='greenText'><b>" + _100BCprofit + "</span> €</b>";
     tmePrint += "<br>";
 
     return tmePrint;
@@ -499,8 +490,8 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     let htVolume = document.getElementById("highestTradingVolume");
     let tmExploit = document.getElementById("timeMachineExploit");
 
-    // Wait 300 ms and then check search options
-    setTimeout(searchOptions, 300);
+    // Wait 500 ms and then check search options
+    setTimeout(searchOptions, 500);
 
     // Check which options are checked.
     function searchOptions() {
@@ -512,7 +503,8 @@ document.getElementById("submitBtn").addEventListener("click", function () {
             resultsDiv.innerHtML += "You must choose at least 1 option!"
         } else {
 
-            resultsDiv.innerHTML += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b><br>"
+            resultsDiv.innerHTML += "<span class='optionHeadline'>Time interval: <b>" + startDateValue +
+            "</b> - <b>" + endDateValue + "</b><br></span>"
         }
 
         if (dwTrend.checked === true) {
