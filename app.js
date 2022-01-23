@@ -391,9 +391,70 @@ function tmExploit() {
     // exploitArr holds the buyDate(0), sellDate(1), and profit(2).
     let exploitArr = [buyDate, sellDate, bestProfit];
 
-    console.log(exploitArr);
-
     return exploitArr;
+}
+
+// Time machine exploit results as a string
+function tmeResults() {
+
+    // The buyDate(0), sellDate(1), and profit(2) of the tima machine exploit.
+    let exploitArr = tmExploit();
+
+    // Datapoints are in some cases from 0:00 UTC, so we might need to
+    // refer to dates as date -1.
+    let buyDate = exploitArr[0];
+    let sellDate = exploitArr[1];
+    let buyDateCorrect = new Date(buyDate);
+    let sellDateCorrect = new Date(sellDate);
+
+    buyDateCorrect.setDate(buyDateCorrect.getDate() -1);
+    sellDateCorrect.setDate(sellDateCorrect.getDate() -1);
+
+    if (buyDate.getUTCHours() === 0) {
+
+        buyDate = buyDateCorrect.toISOString().substring(0, 10);
+    } else {
+
+        buyDate = buyDate.toISOString().substring(0, 10);
+    }
+
+    if (sellDate.getUTCHours() === 0) {
+
+        sellDate = sellDateCorrect.toISOString().substring(0, 10);
+    } else {
+
+        sellDate = sellDate.toISOString().substring(0, 10);
+    }
+
+    // Profits with 1, 10 or 100 bitcoins bought rounded to 2 decimals.
+    let _1BCprofit = exploitArr[2].toFixed(2);
+    let _10BCprofit = (exploitArr[2] * 10).toFixed(2);
+    let _100BCprofit = (exploitArr[2] * 100).toFixed(2);
+
+    console.log("Buy date: " + buyDate);
+    console.log("Sell date: " + sellDate);
+    console.log("1BC profit: " + _1BCprofit);
+    console.log("10BC profit: " + _10BCprofit);
+    console.log("100BC profit: " + _100BCprofit);
+
+
+    let tmePrint = "";
+
+    tmePrint += "<br>";
+    tmePrint += "The time machine exploit (highest profit possible):"
+    tmePrint += "<br><br>";
+    tmePrint += "When to buy: <b>" + buyDate + "</b>";
+    tmePrint += "<br>";
+    tmePrint += "When to sell: <b>" + sellDate + "</b>";
+    tmePrint += "<br>";
+    tmePrint += "Profit with 1 bitcoin (€): <b>" + _1BCprofit + " €</b>";
+    tmePrint += "<br>";
+    tmePrint += "Profit with 10 bitcoin (€): <b>" + _10BCprofit + " €</b>";
+    tmePrint += "<br>";
+    tmePrint += "Profit with 100 bitcoin (€): <b>" + _100BCprofit + " €</b>";
+    tmePrint += "<br>";
+
+    return tmePrint;
 }
 
 // Transforms string to date.
