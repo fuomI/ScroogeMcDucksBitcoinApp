@@ -1,5 +1,5 @@
 // Checking the date and price (in €) of valid price datapoints.
-function datapointTest() {
+function datapointTestPrices() {
 
     let dpObj = getValidPriceDatapoints();
 
@@ -40,7 +40,7 @@ function datapointTestDW() {
 }
 
 // Checking the date and total_volume (in €) of valid volume datapoints.
-function volumeDPtest() {
+function datapointTestVolume() {
 
     let dpObj = getValidVolumeDatapoints();
 

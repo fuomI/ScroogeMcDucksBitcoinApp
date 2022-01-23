@@ -494,15 +494,26 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     // Get API data
     getData();
 
+    // Easy access to checkboxes for options.
     let dwTrend = document.getElementById("downwardTrend");
     let htVolume = document.getElementById("highestTradingVolume");
+    let tmExploit = document.getElementById("timeMachineExploit");
 
     // Wait 300 ms and then check search options
     setTimeout(searchOptions, 300);
 
+    // Check which options are checked.
     function searchOptions() {
 
-        resultsDiv.innerHTML += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b><br>"
+        if (dwTrend.checked === false &&
+            htVolume.checked === false &&
+            tmExploit.checked === false) {
+
+            resultsDiv.innerHtML += "You must choose at least 1 option!"
+        } else {
+
+            resultsDiv.innerHTML += "Time interval: <b>" + startDateValue + "</b> - <b>" + endDateValue + "</b><br>"
+        }
 
         if (dwTrend.checked === true) {
 
@@ -513,6 +524,11 @@ document.getElementById("submitBtn").addEventListener("click", function () {
         if (htVolume.checked === true) {
             let hvResult = hvResults();
             resultsDiv.innerHTML += hvResult;
+        }
+
+        if (tmExploit.checked === true) {
+            let tmeResult = tmeResults();
+            resultsDiv.innerHTML += tmeResult;
         }
     }
 });
