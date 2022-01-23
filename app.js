@@ -493,35 +493,30 @@ document.getElementById("submitBtn").addEventListener("click", async function ()
     let tmExploit = document.getElementById("timeMachineExploit");
 
     // Check which options are checked.
-    function searchOptions() {
+    if (dwTrend.checked === false &&
+        htVolume.checked === false &&
+        tmExploit.checked === false) {
 
-        if (dwTrend.checked === false &&
-            htVolume.checked === false &&
-            tmExploit.checked === false) {
+        resultsDiv.innerHtML += "You must choose at least 1 option!"
+    } else {
 
-            resultsDiv.innerHtML += "You must choose at least 1 option!"
-        } else {
-
-            resultsDiv.innerHTML += "<span class='optionHeadline'>Time interval: <b>" + startDateValue +
-            "</b> - <b>" + endDateValue + "</b><br></span>"
-        }
-
-        if (dwTrend.checked === true) {
-
-            let dwResult = dwResults();
-            resultsDiv.innerHTML += dwResult;
-        }
-
-        if (htVolume.checked === true) {
-            let hvResult = hvResults();
-            resultsDiv.innerHTML += hvResult;
-        }
-
-        if (tmExploit.checked === true) {
-            let tmeResult = tmeResults();
-            resultsDiv.innerHTML += tmeResult;
-        }
+        resultsDiv.innerHTML += "<span class='optionHeadline'>Time interval: <b>" + startDateValue +
+        "</b> - <b>" + endDateValue + "</b><br></span>"
     }
 
-    searchOptions();
+    if (dwTrend.checked === true) {
+
+        let dwResult = dwResults();
+        resultsDiv.innerHTML += dwResult;
+    }
+
+    if (htVolume.checked === true) {
+        let hvResult = hvResults();
+        resultsDiv.innerHTML += hvResult;
+    }
+
+    if (tmExploit.checked === true) {
+        let tmeResult = tmeResults();
+        resultsDiv.innerHTML += tmeResult;
+    }
 });
