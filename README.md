@@ -2,8 +2,9 @@
 
 ## Project description
 
-This is a JavaScript application that I made for 
-the Vincit's pre assignment: https://vincit.fi/risingstar/Vincit-Rising-Star-2021-Pre-assignment.pdf
+This is a JavaScript application that I made for the Vincit's pre assignment: 
+
+https://vincit.fi/risingstar/Vincit-Rising-Star-2021-Pre-assignment.pdf
 
 ## Requirements
 
