@@ -29,8 +29,8 @@ should one buy bitcoins and in which day should one sell said bitcoins for
 maximized profit?
 
 ## Application logic
-1. Get bitcoin data from API (Coingecko) using getData() -function
-2. Get valid datapoints using either getValidPriceDatapoints() or getValidVolumeDatapoints()
+1. Get bitcoin data from API (Coingecko) using **getData()**
+2. Get valid datapoints using either **getValidPriceDatapoints()** or **getValidVolumeDatapoints()**
 3. Process valid datapoints using functions depending on user choices:
 	- **dwTrend()** (downwardTrend) 
 	- **highestVolume()** (highest trading volume)
