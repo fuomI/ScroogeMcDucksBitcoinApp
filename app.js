@@ -1,7 +1,3 @@
-
-document.getElementById("startDate").value = "2021-01-01";
-document.getElementById("endDate").value = "2021-01-30";
-
 // Create API URL and return it.
 function createURL() {
 
@@ -43,25 +39,31 @@ function createURL() {
 let responseObject = {};
 
 // Get data from API using XMLHttpRequest.
-function getData() {
+async function getData() {
 
     // API URL with desired interval.
     let apiURL = createURL();
 
-    // XMLHttpRequest (GET) to the API.
-    let xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", apiURL, true);
-    xmlhttp.send();
+    // Promise response data as an object
+    let dataPromise = new Promise(function(resolve) {
 
-    // If the request is completed and status is OK.
-    xmlhttp.onreadystatechange=function() {
+        // Data is acquired using XMLHttpRequest() (AJAX)
+        let xmlhttp = new XMLHttpRequest();
+        xmlhttp.open('GET', apiURL, true);
 
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        xmlhttp.onreadystatechange=function() {
 
-            // We use JSON.parse to change String to an object.
-            responseObject = JSON.parse(xmlhttp.responseText);
-        }
-    }
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+            resolve(JSON.parse(xmlhttp.responseText));
+            }
+        };
+
+        xmlhttp.send();
+    });
+
+    // When resolved data is saved to responseObject
+    responseObject = await dataPromise;
 }
 
 // The responseObject holds the data received from API
@@ -461,7 +463,7 @@ function transformToDate(dateString) {
 }
 
 // Setting event listener to the "Get results" -button.
-document.getElementById("submitBtn").addEventListener("click", function () {
+document.getElementById("submitBtn").addEventListener("click", async function () {
 
     let startDateDefault = document.getElementById("startDate").defaultValue;
     let endDateDefault = document.getElementById("startDate").defaultValue;
@@ -483,15 +485,12 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     }
 
     // Get API data
-    getData();
+    await getData();
 
     // Easy access to checkboxes for options.
     let dwTrend = document.getElementById("downwardTrend");
     let htVolume = document.getElementById("highestTradingVolume");
     let tmExploit = document.getElementById("timeMachineExploit");
-
-    // Wait 500 ms and then check search options
-    setTimeout(searchOptions, 500);
 
     // Check which options are checked.
     function searchOptions() {
@@ -523,4 +522,6 @@ document.getElementById("submitBtn").addEventListener("click", function () {
             resultsDiv.innerHTML += tmeResult;
         }
     }
+
+    searchOptions();
 });
